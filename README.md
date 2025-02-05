@@ -7,6 +7,32 @@ This repository contains a **Docker Compose setup** for deploying **Nextcloud, D
 ## 🚀 Setup Instructions
 
 ### 1️⃣ Prerequisites
+## 📦 System Requirements
+
+### 🖥️ Hardware Requirements
+- **CPU**: Intel Core i5 (or AMD equivalent)  
+- **RAM**: Minimum **4GB** (Recommended: **8GB+**)  
+- **Disk Space**: At least **20GB free** for Docker images and backups  
+
+### 📌 Required Software Versions
+| Software  | Minimum Version | Installed Version |
+|-----------|----------------|------------------|
+| **Ubuntu** | 20.04+ | `Ubuntu 24.04.1 LTS` |
+| **Kernel** | 5.4+ | `6.8.0-52-generic` |
+| **Docker** | 20.10+ | `Docker version 27.5.1` |
+| **Docker Compose** | v2.0+ | `Docker Compose version v2.32.4` |
+| **Git** | 2.30+ | `git version 2.43.0` |
+| **Python** | 3.8+ | `Python 3.12.3` |
+
+### 🛠️ **Check Installed Versions**
+To check your installed versions, run:
+```sh
+docker --version
+docker compose version
+git --version
+python3 --version
+```
+
 Ensure you have:
 - **Docker & Docker Compose installed**
 - A **public domain name** (e.g., `example.com`)
@@ -19,7 +45,7 @@ Ensure you have:
 
 ### 2️⃣ Clone Repository
 ```bash
-git clone https://github.com/your-repo/example-docker.git
+git clone https://TBD/example-docker.git
 cd example-docker
 ```
 
