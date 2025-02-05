@@ -1,0 +1,19 @@
+# Ignore contents of logs, data, and trainingData but keep the folders
+logs/*
+!logs/.gitkeep
+data/*
+!data/.gitkeep
+trainingData/*
+!trainingData/.gitkeep
+
+# Ignore backup and runtime-generated files
+backup/
+backup-data/
+*.sqlite
+*.db
+*.bak
+*.log
+
+# Ignore system files
+.DS_Store
+Thumbs.db

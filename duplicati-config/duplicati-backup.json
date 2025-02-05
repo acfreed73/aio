@@ -1,0 +1,54 @@
+{
+    "CreatedByVersion": "2.1.0.3",
+    "Schedule": {
+        "ID": 1,
+        "Tags": [
+            "ID=1"
+        ],
+        "Time": "2025-02-06T08:00:00Z",
+        "Repeat": "1D",
+        "LastRun": "2025-02-05T14:40:08Z",
+        "Rule": "",
+        "AllowedDays": null
+    },
+    "Backup": {
+        "ID": "1",
+        "Name": "Nextcloud Backup",
+        "Description": "",
+        "Tags": [],
+        "TargetURL": "s3://admin-duplicati-backups/nextcloud-backup?s3-server-name=minio%3A9000\u0026s3-location-constraint=\u0026s3-storage-class=\u0026s3-client=aws\u0026auth-username=admin\u0026auth-password=strongpassword\u0026endpoint=http%3A%2F%2Fminio%3A9000",
+        "DBPath": "/config/JYZSHHDWLX.sqlite",
+        "Sources": [
+            "/source/db_data/",
+            "/source/nextcloud_data/"
+        ],
+        "Settings": [{
+            "Filter": "",
+            "Name": "--no-encryption",
+            "Value": "true",
+            "Argument": null
+        }],
+        "Filters": [],
+        "Metadata": {
+            "LastBackupDate": "00010101T055100Z",
+            "BackupListCount": "1",
+            "TotalQuotaSpace": "0",
+            "FreeQuotaSpace": "0",
+            "AssignedQuotaSpace": "-1",
+            "TargetFilesSize": "0",
+            "TargetFilesCount": "0",
+            "TargetSizeString": "0 bytes",
+            "SourceFilesSize": "0",
+            "SourceFilesCount": "0",
+            "SourceSizeString": "0 bytes",
+            "LastBackupStarted": "20250205T144008Z",
+            "LastBackupFinished": "20250205T144016Z",
+            "LastBackupDuration": "00:00:08.5921276"
+        },
+        "IsTemporary": false
+    },
+    "DisplayNames": {
+        "/source/db_data/": "db_data",
+        "/source/nextcloud_data/": "nextcloud_data"
+    }
+}

@@ -1,0 +1,152 @@
+---
+
+services:
+  nginx-proxy-manager:
+    image: jc21/nginx-proxy-manager:latest
+    container_name: npm
+    restart: always
+    ports:
+      - "80:80"       # HTTP for Let's Encrypt verification
+      - "443:443"     # HTTPS for secure access
+      - "81:81"       # NPM Admin UI (accessible locally)
+    volumes:
+      - npm_data:/data
+      - npm_letsencrypt:/etc/letsencrypt
+    environment:
+      - TZ=America/Chicago  # Change to your timezone
+
+  stirling-pdf:
+    image: frooodle/s-pdf:latest
+    container_name: stirling-pdf
+    restart: always
+    expose:
+      - "8080"  # Exposed for Nginx Proxy routing
+    volumes:
+      - ./trainingData:/usr/share/tessdata # Required for extra OCR languages
+      - ./extraConfigs:/configs
+      - ./logs:/logs/
+    environment:
+      - DOCKER_ENABLE_SECURITY=false
+      - INSTALL_BOOK_AND_ADVANCED_HTML_OPS=false
+      - LANGS=en_US
+
+  nextcloud:
+    image: nextcloud
+    container_name: nextcloud
+    restart: always
+    expose:
+      - "80"  # Exposed for Nginx Proxy
+    environment:
+      - APACHE_SERVER_NAME=nextcloud.callitweb.com
+      - NEXTCLOUD_ADMIN_USER=admin
+      - NEXTCLOUD_ADMIN_PASSWORD=adminpass
+    volumes:
+      - nextcloud_data:/var/www/html
+    depends_on:
+      - db
+
+  db:
+    image: mariadb
+    container_name: nextcloud_db
+    restart: always
+    environment:
+      - MYSQL_ROOT_PASSWORD=rootpassword
+      - MYSQL_DATABASE=nextcloud
+      - MYSQL_USER=nextcloud
+      - MYSQL_PASSWORD=nextcloudpass
+    volumes:
+      - db_data:/var/lib/mysql
+
+  docuseal:
+    image: docuseal/docuseal:latest
+    container_name: docuseal
+    restart: always
+    depends_on:
+      postgres:
+        condition: service_healthy
+    expose:
+      - "3000"  # Exposed for Nginx Proxy
+    volumes:
+      - ./data:/data
+    environment:
+      - DATABASE_URL=postgresql://postgres:this-needs-to-be-a-long-strong-password@postgres:5432/docuseal
+
+  postgres:
+    image: postgres:15
+    container_name: docuseal_postgres
+    restart: always
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: this-needs-to-be-a-long-strong-password
+      POSTGRES_DB: docuseal
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  ## MinIO - S3-Compatible Storage for Backups
+  minio:
+    image: minio/minio
+    container_name: minio
+    restart: always
+    ports:
+      - "9000:9000"  # MinIO API Port
+      - "9001:9001"  # MinIO Web UI
+    volumes:
+      - minio_data:/data
+    environment:
+      - MINIO_ROOT_USER=admin
+      - MINIO_ROOT_PASSWORD=strongpassword
+    command: server --console-address ":9001" /data
+
+  ## MinIO Client - Creates the backup bucket on first startup
+  mc:
+    image: minio/mc
+    container_name: minio_mc
+    depends_on:
+      - minio
+    entrypoint: >
+      /bin/sh -c "
+      sleep 10;
+      /usr/bin/mc alias set local http://minio:9000 admin strongpassword;
+      /usr/bin/mc mb --ignore-existing local/duplicati-backups;
+      tail -f /dev/null
+      "
+
+  duplicati:
+    image: linuxserver/duplicati
+    container_name: duplicati
+    restart: always
+    ports:
+      - "8200:8200"
+    volumes:
+      - duplicati_data:/config
+      - /etc/localtime:/etc/localtime:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+      - nextcloud_data:/source/nextcloud_data  # ✅ Mount Nextcloud data
+      - db_data:/source/db_data  # ✅ Mount MariaDB database
+      - ./duplicati-config/duplicati-backup.json:/config/duplicati-backup.json  # ✅ Auto-loads backup config
+      - ./duplicati-config/import-script.sh:/config/import-script.sh  # ✅ Script to import the backup job
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Chicago
+      - DUPLICATI__WEBSERVICE_PASSWORD=mynewpassword  # ✅ Set Web UI Password
+      - SETTINGS_ENCRYPTION_KEY=super-secret-key
+      - MINIO_BROWSER_REDIRECT_URL=http://192.168.1.167:9001
+      - MINIO_REGION=us-east-1  # ✅ Set a region
+      - MINIO_API_RESTRICTED=false
+      - MINIO_DOMAIN=  # <<< Force path-style URLs
+    entrypoint: ["/bin/bash", "/config/import-script.sh"]
+
+volumes:
+  npm_data:
+  npm_letsencrypt:
+  nextcloud_data:
+  db_data:
+  pg_data:
+  minio_data:
+  duplicati_data:
