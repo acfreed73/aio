@@ -102,6 +102,8 @@ ui:
   homeDescription: '' # short description or tagline shown on the homepage
   appNameNavbar: '' # name displayed on the navigation bar
 
+  languages: [] # If empty, all languages ​​are enabled. To display only German and Polish ["de_DE", "pl_PL"]. British English is always enabled.
+
 endpoints:
   toRemove: [] # list endpoints to disable (e.g. ['img-to-pdf', 'remove-pages'])
   groupsToRemove: [] # list groups to disable (e.g. ['LibreOffice'])
@@ -113,7 +115,7 @@ metrics:
 AutomaticallyGenerated:
   key: 5b584f43-ba50-4c1c-bf20-d75405658d0b # Automatically Generated Settings (Do Not Edit Directly)
   UUID: f61e7509-8865-4c53-b9c2-bb275558c758 # Automatically Generated Settings (Do Not Edit Directly)
-  appVersion: 0.40.1
+  appVersion: 0.41.0
 
 processExecutor:
   sessionLimit:    # Process executor instances limits

@@ -5,6 +5,7 @@ data/*
 !data/.gitkeep
 trainingData/*
 !trainingData/.gitkeep
+aio.code-workspace
 
 # Ignore backup and runtime-generated files
 backup/
